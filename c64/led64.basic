@@ -7,19 +7,28 @@ let debug=1
 100 print "what do you want to do?"
 print "1 : set rgbmax"
 print "2 : set mode"
+print "3 : set speed"
+print "4 : switch program"
+print "98: set a program as default"
 print "99: save to current slot"
 140 print ""
 print "0: quit"
 input "selection: "; s%
 150 if s% = 1 then gosub 1000
 151 if s% = 2 then gosub 1100
+if s% = 3 then gosub 1200
+if s% = 4 then gosub 1300
 
 
+
+
+if s% = 98 then gosub 9800
 180 if s% = 0 then goto 10000
 goto 10
 
 
 1000 rem rgbmax
+	print chr$(147)
 	let checksum% = 1
 	input "red: "; red%
 	let checksum% = checksum% + red% 
@@ -27,8 +36,8 @@ goto 10
 	let checksum% = checksum% + green%
 	input "blue: "; blue%
 	let checksum% = checksum% + blue%
-	gosub 5100
-	poke 56577, 3
+	gosub 9950
+	poke 56577, 4
 	poke 56577, 1
 	poke 56577, red%
 	poke 56577, green%
@@ -39,15 +48,14 @@ goto 10
 	return
 
 1100 rem set mode
-	let checksum = 2
+	print chr$(147)
 	print "1: static"
 	print "2: blink"
 	input "selection: "; sel%
 	let sel% = sel% - 1
-	let checksum% = checksum% + sel%
-	poke 56579, 255
-	poke 56577, 255
-	poke 56577, 153
+	let checksum% = 2 + sel%
+
+	gosub 9950
 	poke 56577, 1
 	poke 56577, 2
 	poke 56577, s%
@@ -57,6 +65,36 @@ goto 10
 	poke 56579, 0
 	return
 
+1200 rem speed
+	print chr$(147)
+	print "speed is calculated by dividing"
+	print "10000ms by speed value."
+	print "speed = 10 will yield a 1 second"
+	print "speed variable."
+	print ""
+	input "set speed (1-255)"; sel%
+	let checksum% = 3 + sel%
+	let c = not checksum% and 255
+	let c = 256 - c
+	gosub 9950
+	poke 56577, 2
+	poke 56577, 3
+	poke 56577, sel%
+	poke 56577, c
+	return
+
+1300 rem switch program
+	print chr$(147)
+	input "program number (0-31)"; sel%
+	let checksum% = 4 + sel%
+	let c = not checksum% and 255
+	let c = 256 - c
+	gosub 9950
+	poke 56577, 2
+	poke 56577, 4
+	poke 56577, sel%
+	poke 56577, c
+	return
 
 5000 rem debug print
 	print "sum     : " checksum%
@@ -64,11 +102,21 @@ goto 10
 	input "ok.."; temp
 	return
 
-5100 rem send header
+9950 rem send header
 	poke 56577, 255
 	poke 56577, 153
 	return
 
+9800 rem set default
+	print chr$(147)
+	input "program number (0-31)"; sel%
+	let checksum% = 9 + sel%
+	gosub 9950
+	poke 56577, 2
+	poke 56577, 9
+	poke 56577, sel%
+	poke 56577, c
+	return
 
 10000 rem exit.
 	print "ok, thanks!"

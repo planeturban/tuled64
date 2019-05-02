@@ -87,7 +87,7 @@
 
 
   Config:
-  256: enable int0 (pin2). 1 byte
+  510: enable int0 (pin2). 1 byte
 
 
 
@@ -143,7 +143,6 @@ void setup() {
     analogWrite(9, 255);
     analogWrite(10, 0);
     analogWrite(11, 0);
-
     delay(100);
     analogWrite(9, 0);
     delay(100);
