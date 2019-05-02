@@ -80,6 +80,8 @@
     Speed
 
 
+  programData[0] = {255, 0, 255, 0 ,255, 0, 0, 0}
+
   EEPROM layout:
     0 - 255 : Programs.
     256-511: Config data.
@@ -102,7 +104,6 @@ volatile byte sequence = 0;
 byte headerOk = 0;
 byte len = 0;
 byte bytesLeft = 0;
-// byte checksum = 0;
 
 byte program;
 byte lastProgram;
@@ -124,12 +125,25 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(2), restoreButton, FALLING); // Connecteded to PC pin.
 
   program = EEPROM.read(509);
+  if ( program == 255 ) {
+// Blank EEPROM 
+    program = 0;
+    EEPROM.write(509,0);
+  }
   lastProgram = 32;
 
-  for ( int i = 0; i < 32; i++ )
-    for ( int q = 0; i < 8; q++ )
-      EEPROM.get(i * 8, programData[i][q]);
+  for ( int i = 1; i < 32; i++ )
+    for ( int q = 0; q < 8; q++ )
+      programData[i][q] = EEPROM.read((i * 8) + q);
 
+  programData[0][0] = 255;
+  programData[0][1] = 0;
+  programData[0][2] = 0;
+  programData[0][3] = 0;
+  programData[0][4] = 0;
+  programData[0][5] = 0;
+  programData[0][6] = 0;
+  programData[0][7] = 0;
 
 
   attachInterrupt(digitalPinToInterrupt(3), readData, FALLING); // Connecteded to PC pin.
@@ -143,15 +157,15 @@ void setup() {
     analogWrite(9, 255);
     analogWrite(10, 0);
     analogWrite(11, 0);
-    delay(100);
+    delay(50);
     analogWrite(9, 0);
-    delay(100);
+    delay(50);
   }
 
 #ifdef DEBUG
   Serial.begin(115200);
   Serial.println("Begin..");
-  delay(400);
+  delay(100);
 #endif
 }
 
@@ -180,20 +194,9 @@ void loop() {
 void modeZero() {
 #ifdef DEBUG
   Serial.println("Mode zero");
+  Serial.println(programData[program][0]);
+  Serial.println(program);
 #endif
-
-
-  /*
-        programData[program][0] = redMax;
-        programData[program][1] = redMin;
-        programData[program][2] = greenMax;
-        programData[program][3] = greenMin;
-        programData[program][4] = blueMax;
-        programData[program][5] = blueMin;
-        programData[program][6] = mode;
-        programData[program][7] = speed;
-
-  */
   analogWrite(9, programData[program][0]);
   analogWrite(10, programData[program][2]);
   analogWrite(11, programData[program][4]);
@@ -294,7 +297,7 @@ void readData() {
     Serial.println(bytesLeft, DEC);
 #endif
   } else if ( ! bytesLeft && sequence > 2) {
-//    checksum = value;
+    //    checksum = value;
     data[len + 3] = value;
 #ifdef DEBUG
     Serial.println("Done reading! Executing!");

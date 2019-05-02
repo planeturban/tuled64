@@ -1,16 +1,18 @@
 0 rem !to "build/led64.prg"
 poke 56579, 255
 10 print chr$(147)
+print "tul64 config"
+print "------------"
+print ""
 let checksum%=0
 let c=0
 let debug=1
-100 print "what do you want to do?"
 print "1 : set rgbmax"
 print "2 : set mode"
 print "3 : set speed"
 print "4 : switch program"
 print "98: set a program as default"
-print "99: save to current slot"
+rem print "99: save to current slot"
 140 print ""
 print "0: quit"
 input "selection: "; s%
