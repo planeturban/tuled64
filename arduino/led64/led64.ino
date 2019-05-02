@@ -121,29 +121,39 @@ volatile unsigned long int0Pressed = 0;
 
 
 void setup() {
+#ifdef DEBUG
+  Serial.begin(115200);
+  Serial.println("Begin..");
+  delay(100);
+#endif
   if ( EEPROM.read(510) )
     attachInterrupt(digitalPinToInterrupt(2), restoreButton, FALLING); // Connecteded to PC pin.
 
   program = EEPROM.read(509);
-  if ( program == 255 ) {
-// Blank EEPROM 
-    program = 0;
-    EEPROM.write(509,0);
-  }
+
   lastProgram = 32;
 
   for ( int i = 1; i < 32; i++ )
     for ( int q = 0; q < 8; q++ )
       programData[i][q] = EEPROM.read((i * 8) + q);
-
+      
   programData[0][0] = 255;
   programData[0][1] = 0;
   programData[0][2] = 0;
   programData[0][3] = 0;
   programData[0][4] = 0;
   programData[0][5] = 0;
-  programData[0][6] = 0;
-  programData[0][7] = 0;
+  programData[0][7] = 10;
+
+  if ( program == 255 ) {
+    // Blank EEPROM
+    program = 0;
+    EEPROM.write(509, 0);
+
+    programData[0][6] = 1;
+  } else {
+    programData[0][6] = 0;
+  }
 
 
   attachInterrupt(digitalPinToInterrupt(3), readData, FALLING); // Connecteded to PC pin.
@@ -162,11 +172,7 @@ void setup() {
     delay(50);
   }
 
-#ifdef DEBUG
-  Serial.begin(115200);
-  Serial.println("Begin..");
-  delay(100);
-#endif
+
 }
 
 void loop() {
@@ -186,7 +192,18 @@ void loop() {
       modeOne();
       break;
     default:
-      fallbackMode();
+      // Let's do random blink instead.
+#ifdef DEBUG
+      Serial.println("Fallback..");
+#endif
+      programData[program][0] = random(200);
+      programData[program][1] = random(200);
+      programData[program][2] = random(200);
+      programData[program][3] = random(200);
+      programData[program][4] = random(200);
+      programData[program][5] = random(200);
+      programData[program][6] = 1;
+      programData[program][7] = 10;
       break;
   }
 }

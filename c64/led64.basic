@@ -55,16 +55,15 @@ goto 10
 	print "2: blink"
 	input "selection: "; sel%
 	let sel% = sel% - 1
-	let checksum% = 2 + sel%
-
+	let checksum% = 2 + sel% 
 	gosub 9950
-	poke 56577, 1
 	poke 56577, 2
-	poke 56577, s%
+	poke 56577, 2
+	poke 56577, sel%
 	let c = not checksum% and 255
 	let c = 256 - c
 	poke 56577, c
-	poke 56579, 0
+
 	return
 
 1200 rem speed
