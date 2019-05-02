@@ -1,6 +1,6 @@
-# Totally Useless LED64
+# Totally Useless LED Programmer 64
 ### Wuuut?
-It's just a useless way to use a RGB led as powerled in a C64. Why? Why not?
+It's just a useless way to use a RGB led as powerled in a C64. Why? Why not? It's pronounced TÖLP SIXTIFÅR since the author is from Sundsvall, Sweden.
 
 # Hardware
 The hardware is pretty much a stripped down Arduno Uno: an ATmega328p, an 16MHz xtal, two capacitors to piggyback on CIA2 of the C64. (The xtal and capacitors could be skipped, runnig at 8Mhz internal clock ought to be enough).
