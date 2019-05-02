@@ -13,7 +13,7 @@ The hardware is pretty much a stripped down Arduno Uno: an ATmega328p, an 16MHz 
 | U1 | TQFP32 |ATMega 328P  |
 | C1 | 1206 | Capacitor 22pf |
 | C2 | 1206 | Capacitor 22pf |
-| Y2 | HC49-US | Xtal |
+| Y2 | HC49-US | Xtal 16MHz |
 
 ## Operation
 Int1 (Arduino pin3 or ATmega pin1) is connected to  the port control (/PC) of CIA2, detecting when something is being sent from the C64 by attatching interrupt to falling state. This initializes the sequence counter interrupt function; not a pretty sight in the code, but it works. 
@@ -55,22 +55,23 @@ CMD plus data is added together, xor'd and substracted from 256, let's say we're
 | Set color max | 0x06  | 2 | Color (Red = 0, Green = 1, Blue = 2), value (0-255) |
 | Set color min | 0x07  | 2 | Color (Red = 0, Green = 1, Blue = 2), value (0-255) |
 | Set program | 0x08  | 8 | Write program, see "Program" |
+| Set start up program | 0x09 | 1 | Program number 0-31 |
 | Next mode | 0x10 | - |  |
 | Previous mode | 0x11  | -  |  |
 | Next program | 0x12 | - |  |
 | Previous program | 0x13 | - |  |
-| Red + 1 | 0x14 | - | redMax + 1 |
-| Red - 1 | 0x15 | - | redMax - 1 |
-| Green + 1 | 0x16 | - | greenMax + 1 |
-| Green - 1 | 0x17 | - | greenMax - 1 |
-| Blue + 1 | 0x18 | - | blueMax + 1 |
-| Blue - 1 | 0x19 | - | blueMax + 1 |
-| Red + 10 | 0x1a | - | redMax + 10 |
-| Red - 10 | 0x1b | - | redMax - 10 |
-| Green + 10 | 0x1c | - | greenMax + 10 |
-| Green - 10 | 0x1d | - | greenMax - 10 |
-| Blue + 10 | 0x1e | - | blueMax + 10 |
-| Blue - 10 | 0x1f | - | blueMax + 10 |
+| Red + 1 | 0x14 | - |  |
+| Red - 1 | 0x15 | - |  |
+| Green + 1 | 0x16 | - |  |
+| Green - 1 | 0x17 | - |  |
+| Blue + 1 | 0x18 | - |  |
+| Blue - 1 | 0x19 | - |  |
+| Red + 10 | 0x1a | - |  |
+| Red - 10 | 0x1b | - |  |
+| Green + 10 | 0x1c | - |  |
+| Green - 10 | 0x1d | - |  |
+| Blue + 10 | 0x1e | - |  |
+| Blue - 10 | 0x1f | - |  |
 | Speed + 1 | 0x20 | - |  |
 | Speed - 1 | 0x21 | - |  |
 | Speed + 10 | 0x22 | - |  |
@@ -186,9 +187,10 @@ As described in operetion an interrupt is attached, to read the data. However si
 | Byte | Data | Explanation |
 |--|--|--|
 | 0-255 | Programs | As described above. |
-| 256 | Enable int0 | Enable interrupt on Arduino pin 2. |
-| 257-511 | Reserved | |
-
+| 257-508 | Reserved | |
+| 509 | Program at start | Which program to run at start? 0-31 |
+| 510 | Enable int0 | Enable interrupt on Arduino pin 2. |
+| 511 | Version | Not implemented |
 
 ## C64
 ### Basic (yes, BASIC!) code
