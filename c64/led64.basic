@@ -11,6 +11,7 @@ print "1 : set rgbmax"
 print "2 : set mode"
 print "3 : set speed"
 print "4 : switch program"
+print "97: color tune" 
 print "98: set a program as default"
 rem print "99: save to current slot"
 140 print ""
@@ -23,7 +24,7 @@ if s% = 4 then gosub 1300
 
 
 
-
+if s% = 97 then gosub 9700
 if s% = 98 then gosub 9800
 180 if s% = 0 then goto 10000
 goto 10
@@ -103,9 +104,43 @@ goto 10
 	input "ok.."; temp
 	return
 
-9950 rem send header
-	poke 56577, 255
-	poke 56577, 153
+
+9700 rem color tune
+	rem disable buffer
+	poke 649,0
+	tmp = peek (197)
+	print "red:    q=+1 w=-1 e=+10 r=-10"
+	print "green:  a=+1 s=-1 d=+10 f=-10"
+	print "blue:   z=+1 s=-x c=+10 v=-10"
+	print "return: main menu"
+	print ""
+	9719 print "key "; key
+	9720 sel% = 0
+	9721 key = peek(197)
+	if key = 64 then 9720
+	if key = 62 then sel% = 20
+	if key = 9 then sel% = 21
+	if key = 10 then sel% = 22
+	if key = 13 then sel% = 23 
+	if key = 12 then sel% = 24
+	if key = 23 then sel% = 25 
+
+	let c = not sel% and 255
+	let c = 256 - c 
+	gosub 9950
+	poke 56577, 1
+	poke 56577, sel%
+	poke 56577, c
+	if key = 1 then 9790
+
+	print "key "; key; " cmd "; sel%; " sum "; c
+	goto 9720
+
+
+	rem enable buffer
+	9790 poke 649,10: poke 808,237
+	
+
 	return
 
 9800 rem set default
@@ -117,6 +152,14 @@ goto 10
 	poke 56577, 9
 	poke 56577, sel%
 	poke 56577, c
+	return
+
+
+
+
+9950 rem send header
+	poke 56577, 255
+	poke 56577, 153
 	return
 
 10000 rem exit.
