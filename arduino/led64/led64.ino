@@ -107,7 +107,7 @@ byte bytesLeft = 0;
 
 byte program;
 byte lastProgram;
-byte maxMode = 1;
+byte maxMode = 3;
 byte programData[32][8];
 
 
@@ -136,7 +136,7 @@ void setup() {
   for ( int i = 1; i < 32; i++ )
     for ( int q = 0; q < 8; q++ )
       programData[i][q] = EEPROM.read((i * 8) + q);
-      
+
   programData[0][0] = 255;
   programData[0][1] = 0;
   programData[0][2] = 0;
@@ -150,7 +150,7 @@ void setup() {
     program = 0;
     EEPROM.write(509, 0);
 
-    programData[0][6] = 1;
+    programData[0][6] = 2;
   } else {
     programData[0][6] = 0;
   }
@@ -191,6 +191,13 @@ void loop() {
     case 1:
       modeOne();
       break;
+    case 2:
+      modeRandom();
+      break;
+    case 3:
+      modeRandom2();
+      break;
+
     default:
       // Let's do random blink instead.
 #ifdef DEBUG
@@ -244,6 +251,54 @@ void modeOne() {
     }
   }
 }
+
+void modeRandom() {
+  unsigned long last = millis();
+  Serial.println("randomMode");
+  while ( ! exitLoop ) {
+    if ( millis() - last >= (10000 / programData[program][7]))  {
+      programData[program][0] = random(200);
+      programData[program][1] = random(200);
+      programData[program][2] = random(200);
+      programData[program][3] = random(200);
+      programData[program][4] = random(200);
+      programData[program][5] = random(200);
+      programData[program][6] = random(2);
+
+      programData[program][7] = random(1, 100);
+      last = millis();
+      analogWrite(9, programData[program][0]);
+      analogWrite(10, programData[program][2]);
+      analogWrite(11, programData[program][4]);
+    }
+  }
+  last = millis();
+}
+
+
+void modeRandom2() {
+  unsigned long last = millis();
+  Serial.println("randomMode");
+  while ( ! exitLoop ) {
+    if ( millis() - last >= (10000 / programData[program][7]))  {
+      programData[program][0] = random(200);
+      programData[program][1] = random(200);
+      programData[program][2] = random(200);
+      programData[program][3] = random(200);
+      programData[program][4] = random(200);
+      programData[program][5] = random(200);
+      programData[program][6] = random(2);
+
+      last = millis();
+      analogWrite(9, programData[program][0]);
+      analogWrite(10, programData[program][2]);
+      analogWrite(11, programData[program][4]);
+    }
+  }
+  last = millis();
+}
+
+
 
 void fallbackMode() {
 #ifdef DEBUG
@@ -491,46 +546,59 @@ void executeCommand() {
       break;
 
     case 0x16:
-      programData[program][1]++;
-      break;
-    case 0x17:
-      programData[program][1]--;      break;
-    case 0x18:
       programData[program][2]++;
       break;
-    case 0x19:
+    case 0x17:
       programData[program][2]--;
+      break;
+    case 0x18:
+      programData[program][4]++;
+      break;
+    case 0x19:
+      programData[program][4]--;
       break;
 
 
     case 0x1A:
-      if ( programData[program][0] < 246 )
+      if ( programData[program][0] <= 245 )
         programData[program][0] = programData[program][0] + 10;
+      else
+        programData[program][0] = 255;
       break;
 
     case 0x1B:
-      if ( programData[program][0] < 9 )
+      if ( programData[program][0] >= 10 )
         programData[program][0] = programData[program][0] - 10;
+      else
+        programData[program][0] = 0;
       break;
 
     case 0x1C:
-      if ( programData[program][2] < 246 )
+      if ( programData[program][2] <= 245 )
         programData[program][2] = programData[program][2] + 10;
+      else
+        programData[program][2] = 255;
       break;
 
     case 0x1D:
-      if ( programData[program][2] < 9 )
+      if ( programData[program][2] >= 10  )
         programData[program][2] = programData[program][2] - 10;
+      else
+        programData[program][2] = 0;
       break;
 
     case 0x1E:
-      if ( programData[program][4] < 246 )
+      if ( programData[program][4] <= 245 )
         programData[program][4] = programData[program][4] + 10;
+      else
+        programData[program][4] = 255;
       break;
 
     case 0x1F:
-      if ( programData[program][4] < 9 )
+      if ( programData[program][4] >= 10 )
         programData[program][4] = programData[program][4] - 10;
+      else
+        programData[program][4] = 0;
       break;
 
     case 0x20:
@@ -543,11 +611,11 @@ void executeCommand() {
       break;
 
     case 0x22:
-      if ( programData[program][7] < 246 )
+      if ( programData[program][7] < 245 )
         programData[program][7] = programData[program][7] + 10;
       break;
     case 0x23:
-      if (programData[program][7] > 9 )
+      if (programData[program][7] > 10 )
         programData[program][7] = programData[program][7] - 10;
       break;
 
